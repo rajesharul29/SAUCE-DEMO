@@ -1,0 +1,16 @@
+{
+  "invalid_login_credentials" : [
+    {
+      "user_name":"test_user",
+      "password":"5646"
+    }
+  
+  ],
+  "valid_login_credentials" : [
+    {
+      "user_name":"standard_user",
+      "password":"secret_sauce"
+
+    }
+  ]
+}
