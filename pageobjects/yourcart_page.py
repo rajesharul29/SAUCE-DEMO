@@ -1,9 +1,11 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from utils.browserutils import BrowserUtils
 
-class CartPage():
+class YourCartPage(BrowserUtils):
   def __init__(self,driver):
+    super().__init__(driver)
     self.driver=driver
     self.page_header_locator = (By.CSS_SELECTOR,".title")
     self.continue_shopping_button_locator = (By.CSS_SELECTOR,"#continue-shopping")
@@ -17,20 +19,19 @@ class CartPage():
     return self.driver.find_element(*self.page_header_locator).text
   
   def get_page_title(self):
-    return self.driver.title
+    return self.get_title()
+    
   
   def is_continue_shopping_button_available(self):
     self.driver.execute_script("window.scrollBy(0,document.body.scrollHeight);")
-    return self.driver.find_element(*self.continue_shopping_button_locator).is_displayed()
+    return self.wait_for_visible(self.continue_shopping_button_locator).is_displayed()
   
   def is_checkout_button_enabled(self):
     self.driver.execute_script("window.scrollBy(0,document.body.scrollHeight);")
-    return self.driver.find_element(*self.checkout_button_locator).is_displayed()
+    return self.wait_for_visible(self.checkout_button_locator).is_displayed()
   
   def all_products_available_cart(self):
-    wait = WebDriverWait(self.driver, 10)
-    wait.until(EC.presence_of_element_located(self.products_in_cart))
-    return len(self.driver.find_elements(*self.products_in_cart))
+    return len(self.wait_for_all_present(self.products_in_cart))
   
   def get_cart_item_count(self):
     return int(self.driver.find_element(*self.cart_count).text)
@@ -39,9 +40,8 @@ class CartPage():
     self.driver.execute_script("window.scrollBy(0,document.body.scrollHeight);")
     self.driver.find_element(*self.checkout_button_locator).click()
     
-  def get_product_names_from_list(self):
-    wait = WebDriverWait(self.driver,10)
-    wait.until(EC.presence_of_element_located(self.products_in_cart))
+  def get_product_names_from_your_cart_page(self):
+    self.wait_for_all_present(self.products_in_cart)
     cart_items = self.driver.find_elements(*self.products_in_cart)
     products_list = []
     for item in cart_items:
@@ -50,13 +50,11 @@ class CartPage():
     return products_list
   
   def get_remove_buttons_count(self):
-    wait = WebDriverWait(self.driver,10)
-    return len(wait.until(EC.visibility_of_all_elements_located(self.remove_button_list)))
+    return len(self.wait_for_all_present(self.remove_button_list))
     
   
   def remove_first_cart_item(self):
-    wait = WebDriverWait(self.driver,10)
-    buttons_list = wait.until(EC.visibility_of_all_elements_located(self.remove_button_list))
+    buttons_list = self.wait_for_all_present(self.remove_button_list)
     buttons_list[0].click()
     
     

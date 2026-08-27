@@ -1,7 +1,7 @@
-from pageobjects.checkout_page import CheckoutPage
+from pageobjects.checkout_your_infopage import CheckoutYourInfo
 from pageobjects.login_page import LoginPage
 from pageobjects.inventory_page import InventoryPage
-from pageobjects.cart_page import CartPage
+from pageobjects.yourcart_page import YourCartPage
 import pytest
 import json
 
@@ -21,11 +21,11 @@ def test_checkout_page_loaded_successfully(browser,test_list_item):
     inv.add_all_products_to_cart()
     inv.click_cart_logo()
     
-    cart_page = CartPage(driver)
+    cart_page = YourCartPage(driver)
     cart_page.all_products_available_cart()
     cart_page.click_checkout_button()
     
-    checkout_page = CheckoutPage(driver)
+    checkout_page = CheckoutYourInfo(driver)
     # checkout_page.enter_user_details("Arul", "Rajeesh", "1234")
     # checkout_page.click_continue_button()
     assert checkout_page.is_continue_button_available()

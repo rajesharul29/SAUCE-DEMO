@@ -1,12 +1,14 @@
 from selenium.webdriver.common.by import By
-
-class CheckoutComplete():
+from utils.browserutils import BrowserUtils
+class CheckoutComplete(BrowserUtils):
   def __init__(self,driver):
+    super().__init__(driver)
     self.driver = driver
     self.order_message = (By.CSS_SELECTOR,".complete-text")
   
-  def get_page_header(self):
-    self
+  def get_page_header(browser):
+    driver=browser
+    self.driver
     
   def get_current_url(self):
     pass

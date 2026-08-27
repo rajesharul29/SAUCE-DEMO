@@ -13,43 +13,45 @@ class InventoryPage(BrowserUtils):
     self.add_to_cart_buttons_locator = (By.XPATH,"//div[@class = 'inventory_list']/div/div/div[2]/button")
     self.cart_count = (By.XPATH,"//span[@class='shopping_cart_badge']")
     self.price_of_listed_products_locator = (By.XPATH,"//div[@class='inventory_item_price']")
-    
+
   def get_page_header(self):
-    return self.driver.find_element(*self.page_header_locator).text
-  
-  # def get_page_title(self):
-  #   return self.driver.title
-  
+    # Wait for page header to be visible before reading its text
+    return self.wait_for_visible(self.page_header_locator).text
+
   def is_filter_available(self):
-    return self.driver.find_element(*self.filter_locator).is_displayed()
-  
+    return self.wait_for_visible(self.filter_locator).is_displayed()
+
   def is_cart_logo_available(self):
-    return self.driver.find_element(*self.cart_logo_locator).is_displayed()
-  
+    return self.wait_for_visible(self.cart_logo_locator).is_displayed()
+
   def is_slidebar_available(self):
-    return self.driver.find_element(*self.slidebar_logo_locator).is_displayed()
-  
+    return self.wait_for_visible(self.slidebar_logo_locator).is_displayed()
+
   def add_all_products_to_cart(self):
-    buttons = self.driver.find_elements(*self.add_to_cart_buttons_locator)
-    for button in range(len(buttons)):
-      buttons[button].click()
-    return self.driver.find_element(*self.cart_count).text
-  
+    # Wait for all buttons to be in DOM before iterating
+    buttons = self.wait_for_all_present(self.add_to_cart_buttons_locator)
+    for button in buttons:
+      # Each click updates the DOM — wait for each button to be clickable
+      self.wait_for_clickable(self.add_to_cart_buttons_locator)
+      button.click()
+    # Cart badge appears after first item is added — wait for it
+    return self.wait_for_visible(self.cart_count).text
+
   def sort_products_accending_by_price(self):
-    options=Select(self.driver.find_element(*self.filter_locator))
+    # Wait for filter to be interactable before using Select
+    options = Select(self.wait_for_clickable(self.filter_locator))
     options.select_by_index(2)
-    price_elements = self.driver.find_elements(*self.price_of_listed_products_locator)
-    
-    actual_prices =[]
-    for price in price_elements:
-      actual_prices.append(float(price.text.replace("$","")))
-      
-    expected_prices = sorted(actual_prices)
-    return actual_prices == expected_prices
-  
+    # After sort, wait for price list to re-render
+    price_elements = self.wait_for_all_present(self.price_of_listed_products_locator)
+    actual_prices = [float(p.text.replace("$", "")) for p in price_elements]
+    return actual_prices == sorted(actual_prices)
+
   def click_cart_logo(self):
     self.driver.execute_script("window.scrollBy(0,-700);")
-    self.driver.find_element(*self.cart_logo_locator).click()
+    # Wait for cart logo to be clickable before clicking
+    self.wait_for_clickable(self.cart_logo_locator).click()
+    # Wait for URL to transition to cart page
+    self.wait_for_url_contains("cart")
     return self.driver.current_url
     
     
